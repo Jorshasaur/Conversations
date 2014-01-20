@@ -1,0 +1,14 @@
+{
+  "name": "YourAppName",
+  "version": "0.0.0",
+  "homepage": "YourAppHomepage",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "dist/vendor",
+    "test",
+    "tests"
+  ]
+}
