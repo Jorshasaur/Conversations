@@ -1,12 +1,12 @@
 {
-  "name": "YourAppName",
-  "version": "0.0.0",
-  "description": "",
+  "name": "Conversations",
+  "version": "0.1",
+  "description": "Conversations is a fun project to get random bits of responses back from coded choices.  Sort of like a magic 8 ball.  The goal is to create several different personas, which could all talk to each other using this code.",
   "main": "dist/scripts/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "YourName",
+  "author": "Josh Barber",
   "license": "BSD",
   "devDependencies": {
     "grunt": "~0.4.2",
