@@ -1219,11 +1219,11 @@ leven = require('fast-levenshtein');
 
 Character = (function() {
   function Character() {
+    this.replies = [];
     this.buildReplies();
   }
 
   Character.prototype.buildReplies = function() {
-    this.replies = [];
     this.replies.push("I have no idea.");
     this.replies.push("You should think more on that.");
     this.replies.push("That doesn't make any sense, please elaborate.");
@@ -1231,20 +1231,40 @@ Character = (function() {
   };
 
   Character.prototype.ask = function(question) {
-    var closestReply, distance, reply, _i, _len, _ref;
+    var closestReply, count, distance, reply, _i, _len, _ref;
     closestReply = "";
     this.closestDistance = 999;
     question = this.formatSentence(question);
     _ref = this.replies;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      reply = _ref[_i];
+    for (count = _i = 0, _len = _ref.length; _i < _len; count = ++_i) {
+      reply = _ref[count];
       distance = leven.get(this.formatSentence(reply), question);
+      if (distance === 0) {
+        return this.getRandomReplyWithExclusion(count);
+      }
       if (distance < this.closestDistance) {
         this.closestDistance = distance;
         closestReply = reply;
       }
     }
     return closestReply;
+  };
+
+  Character.prototype.getRandomReplyWithExclusion = function(index) {
+    var clone;
+    clone = this.cloneReplies();
+    clone.splice(index, 1);
+    return this.getRandomReply(clone);
+  };
+
+  Character.prototype.getRandomReply = function(array) {
+    var rand;
+    rand = Math.round(Math.random() * (array.length - 1));
+    return array[rand];
+  };
+
+  Character.prototype.random = function() {
+    return this.getRandomReply(this.replies);
   };
 
   Character.prototype.formatSentence = function(sentence) {
@@ -1256,6 +1276,10 @@ Character = (function() {
     return sentence.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, "");
   };
 
+  Character.prototype.cloneReplies = function() {
+    return this.replies.slice(0);
+  };
+
   return Character;
 
 })();
@@ -1264,6 +1288,59 @@ module.exports = Character;
 
 
 },{"fast-levenshtein":6}],8:[function(require,module,exports){
+var Character, Spock, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Character = require("./character.coffee");
+
+Spock = (function(_super) {
+  __extends(Spock, _super);
+
+  function Spock() {
+    _ref = Spock.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Spock.prototype.buildReplies = function() {
+    this.replies.push("It is curious how often you humans manage to obtain that which you do not want.");
+    this.replies.push("I am endeavoring, ma'am, to construct a mnemonic circuit using stone knives and bearskins.");
+    this.replies.push("I have never understood the female capacity to avoid a direct answer to any question.");
+    this.replies.push("If there are self-made purgatories, then we all have to live in them. Mine can be no worse than someone else's.");
+    this.replies.push("Logic is little tweeting bird chirping in meadow. Logic is wreath of pretty flowers that smell bad.");
+    this.replies.push("Your illogical approach to chess does have its advantages on occasion.");
+    this.replies.push("After a time, you may find that having is not so pleasing a thing, after all, as wanting. It is not logical, but it is often true.");
+    this.replies.push("Computers make excellent and efficient servants, but I have no wish to serve under them.");
+    this.replies.push("Judging by the pollution content of the atmosphere, I believe we have arrived at the late twentieth century.");
+    this.replies.push("They like you very much, but they are not the hell your whales.");
+    this.replies.push("Nowhere am I so desperately needed as among a shipload of illogical humans.");
+    this.replies.push("On my planet \"to rest\" is to rest, to cease using energy. To me it is quite illogical to run up and down on green grass using energy instead of saving it.");
+    this.replies.push("Fascinating is a word I use for the unexpected. In this case, I should think \"interesting\" would suffice. ");
+    this.replies.push("You almost make me believe in luck.");
+    this.replies.push("If I seem insensitive to what you’re going through understand – it’s the way I am.");
+    this.replies.push("May I say that I have not thoroughly enjoyed serving with Humans? I find their illogic and foolish emotions a constant irritant.");
+    this.replies.push("Fortunately, my ancestors spawned in another ocean than yours did. My blood cells are quite different.");
+    this.replies.push("Your logic was impeccable. We are in grave danger.");
+    this.replies.push("Interesting. You Earth people glorify organized violence for 40 centuries, but you imprison those who employ it privately.");
+    this.replies.push("Where there is no emotion, there is no motive for violence.");
+    this.replies.push("Has it occurred to you that there is a certain inefficiency in constantly questioning me on things you’ve already made up your mind about?");
+    this.replies.push("A very interesting game, this poker.");
+    this.replies.push("This troubled planet is a place of the most violent contrasts. Those who receive the rewards are totally separated from those who shoulder the burdens. It is not a wise leadership.");
+    this.replies.push("The most unfortunate lack in current computer programming is that there is nothing available to immediately replace the starship surgeon.");
+    this.replies.push("Pain is a thing of the mind. The mind can be controlled.");
+    this.replies.push("Being a red blooded human clearly has it’s disadvantages.");
+    this.replies.push("Frankly, I was rather dismayed by your use of the term 'half-breed'. You must admit it is an unsophisticated expression.");
+    return this.replies.push("In critical moments men sometimes see exactly what they wish to see.");
+  };
+
+  return Spock;
+
+})(Character);
+
+module.exports = Spock;
+
+
+},{"./character.coffee":7}],9:[function(require,module,exports){
 var Character, assert;
 
 assert = require('assert');
@@ -1274,21 +1351,21 @@ describe("Character tests", function() {
   beforeEach(function() {
     return this.character = new Character();
   });
-  it("should find a distance of zero for 'I have no idea' when that is the question.", function() {
+  it("should not find a distance of zero for 'I have no idea' when that is the question.", function() {
     this.character.ask("I have no idea.");
-    return assert.equal(this.character.closestDistance, 0);
+    return assert.notEqual(this.character.closestDistance, 0);
   });
-  it("should find a distance of zero for 'I have no idea' when that is the question with no punctuation.", function() {
+  it("should not find a distance of zero for 'I have no idea' when that is the question with no punctuation.", function() {
     this.character.ask("I have no idea");
-    return assert.equal(this.character.closestDistance, 0);
+    return assert.notEqual(this.character.closestDistance, 0);
   });
-  it("should find a distance of zero for 'I have no idea' when that is the question with differing punctuation.", function() {
+  it("should not find a distance of zero for 'I have no idea' when that is the question with differing punctuation.", function() {
     this.character.ask("I have no idea!!!");
-    return assert.equal(this.character.closestDistance, 0);
+    return assert.notEqual(this.character.closestDistance, 0);
   });
-  it("should find a distance of zero for 'I have no idea' when that is the question with differing cases.", function() {
+  it("should not find a distance of zero for 'I have no idea' when that is the question with differing cases.", function() {
     this.character.ask("I HAVE NO IDEA.");
-    return assert.equal(this.character.closestDistance, 0);
+    return assert.notEqual(this.character.closestDistance, 0);
   });
   it("should answer 'I have no idea.' to 'What are you wearing today?'", function() {
     var answer;
@@ -1307,4 +1384,23 @@ describe("Character tests", function() {
 });
 
 
-},{"../scripts/characters/character.coffee":7,"assert":1}]},{},[8])
+},{"../scripts/characters/character.coffee":7,"assert":1}],10:[function(require,module,exports){
+var Spock, assert;
+
+assert = require('assert');
+
+Spock = require('../scripts/characters/spock.coffee');
+
+describe("Spock tests", function() {
+  beforeEach(function() {
+    return this.character = new Spock();
+  });
+  return it("should never answer the same answer as the question", function() {
+    var answer;
+    answer = this.character.ask("It is curious how often you humans manage to obtain that which you do not want.");
+    return assert.notEqual(answer, "It is curious how often you humans manage to obtain that which you do not want.");
+  });
+});
+
+
+},{"../scripts/characters/spock.coffee":8,"assert":1}]},{},[9,10])
