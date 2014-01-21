@@ -9007,7 +9007,7 @@ if ( typeof window === "object" && typeof window.document === "object" ) {
 
 
 },{}],3:[function(require,module,exports){
-var $, Spock, Veronica;
+var $, Spock, Swanson, Veronica;
 
 $ = require('../../dist/vendor/jquery/jquery.js');
 
@@ -9015,17 +9015,22 @@ Spock = require('./characters/spock.coffee');
 
 Veronica = require('./characters/veronica.coffee');
 
+Swanson = require('./characters/swanson.coffee');
+
 $(document).ready(function() {
-  var random;
+  var ranVeronica, random;
   this.spock = new Spock();
   this.veronica = new Veronica();
-  random = this.spock.random();
-  console.log(random);
-  return console.log(this.veronica.ask(random));
+  this.swanson = new Swanson();
+  random = this.swanson.random();
+  ranVeronica = this.veronica.ask(random);
+  console.log("Ron Swanson::", random);
+  console.log("Veronica Palmer::", ranVeronica);
+  return console.log("Spock::", this.spock.ask(random));
 });
 
 
-},{"../../dist/vendor/jquery/jquery.js":1,"./characters/spock.coffee":5,"./characters/veronica.coffee":6}],4:[function(require,module,exports){
+},{"../../dist/vendor/jquery/jquery.js":1,"./characters/spock.coffee":5,"./characters/swanson.coffee":6,"./characters/veronica.coffee":7}],4:[function(require,module,exports){
 var Character, leven;
 
 leven = require('fast-levenshtein');
@@ -9120,7 +9125,7 @@ Spock = (function(_super) {
     this.replies.push("I am endeavoring, ma'am, to construct a mnemonic circuit using stone knives and bearskins.");
     this.replies.push("I have never understood the female capacity to avoid a direct answer to any question.");
     this.replies.push("If there are self-made purgatories, then we all have to live in them. Mine can be no worse than someone else's.");
-    this.replies.push("Logic is little tweeting bird chirping in meadow. Logic is wreath of pretty flowers that smell bad.");
+    this.replies.push("Logic is a little tweeting bird chirping in meadow. Logic is a wreath of pretty flowers that smell bad.");
     this.replies.push("Your illogical approach to chess does have its advantages on occasion.");
     this.replies.push("After a time, you may find that having is not so pleasing a thing, after all, as wanting. It is not logical, but it is often true.");
     this.replies.push("Computers make excellent and efficient servants, but I have no wish to serve under them.");
@@ -9154,6 +9159,70 @@ module.exports = Spock;
 
 
 },{"./character.coffee":4}],6:[function(require,module,exports){
+var Character, Swanson, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Character = require("./character.coffee");
+
+Swanson = (function(_super) {
+  __extends(Swanson, _super);
+
+  function Swanson() {
+    _ref = Swanson.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Swanson.prototype.buildReplies = function() {
+    this.replies.push("Clear alcohols are for rich women on diets.");
+    this.replies.push("Crying: acceptable at funerals and the Grand Canyon.");
+    this.replies.push("I am going to consume all of this at the same time because I am a free American.");
+    this.replies.push("Under my tutelage, you will grow from boys to men. From men into gladiators. And from gladiators into Swansons.");
+    this.replies.push("I'm a simple man. I like pretty, dark-haired women, and breakfast food.");
+    this.replies.push("Never half-ass two things. Whole-ass one thing.");
+    this.replies.push("Straight down the middle. No hook, no spin, no fuss. Anything more and this becomes figure skating.");
+    this.replies.push("I don’t want to paint with a broad brush here, but every single contractor in the world is a miserable, incompetent thief.");
+    this.replies.push("Fishing relaxes me. It’s like yoga, except I still get to kill something.");
+    this.replies.push("Just give me all the bacon and eggs you have.");
+    this.replies.push("When people get a little too chummy with me I like to call them by the wrong name to let them know I don’t really care about them.");
+    this.replies.push("There’s only one thing I hate more than lying: skim milk. Which is water that’s lying about being milk.");
+    this.replies.push("The government is a greedy piglet that suckles on a taxpayer’s teat until they have sore, chapped nipples.");
+    this.replies.push("I once worked with a guy for three years and never learned his name. Best friend I ever had. We still never talk sometimes.");
+    this.replies.push("When I eat, it is the food that is scared.");
+    this.replies.push("My only official recommendations are US Army-issued mustache trimmers, Morton’s Salt, and the C.R. Lawrence Fein two inch axe-style scraper oscillating knife blade.");
+    this.replies.push("Are you going to tell a man that he can’t fart in his own car?");
+    this.replies.push("Turkey can never beat cow.");
+    this.replies.push("It’s always a good idea to demonstrate to your coworkers that you are capable of withstanding a tremendous amount of pain.");
+    this.replies.push("There are three acceptable haircuts: high and tight, crew cut, buzz cut.");
+    this.replies.push("Capitalism: God’s way of determining who is smart and who is poor.");
+    this.replies.push("Any dog under fifty pounds is a cat and cats are useless.");
+    this.replies.push("Fish, for sport only, not for meat. Fish meat is practically a vegetable.");
+    this.replies.push("There is only one bad word: taxes.");
+    this.replies.push("History began July 4th, 1776. Anything before that was a mistake.");
+    this.replies.push("Cultivating a manly musk puts opponent on notice.");
+    this.replies.push("Give a man a fish and feed him for a day. Don’t teach a man to fish…and feed yourself. He’s a grown man. And fishing’s not that hard.");
+    this.replies.push("Child labor laws are ruining this country.");
+    this.replies.push("Great job, everyone. The reception will be held in each of our individual houses, alone.");
+    this.replies.push("America: The only country that matters. If you want to experience other 'cultures,'' use an atlas or a ham radio.");
+    this.replies.push("The key to burning an ex-wife effigy is to dip it in paraffin wax and then toss the flaming bottle of isopropyl alcohol from a safe distance. Do not stand too close when you light an ex-wife effigy.");
+    this.replies.push("There are only three ways to motivate people: money, fear, and hunger.");
+    this.replies.push("Shorts over six inches are capri pants, shorts under six inches are European.");
+    this.replies.push("Friends: one to three is sufficient.");
+    this.replies.push("Breakfast food can serve many purposes.");
+    this.replies.push("One rage every three months is permitted. Try not to hurt anyone who doesn’t deserve it.");
+    this.replies.push("Strippers do nothing for me…but I will take a free breakfast buffet anytime, anyplace.");
+    this.replies.push("You had me at meat tornado.");
+    return this.replies.push("On second thought i think i will have that third steak.");
+  };
+
+  return Swanson;
+
+})(Character);
+
+module.exports = Swanson;
+
+
+},{"./character.coffee":4}],7:[function(require,module,exports){
 var Character, Veronica, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -9211,4 +9280,4 @@ Veronica = (function(_super) {
 module.exports = Veronica;
 
 
-},{"./character.coffee":4}]},{},[3,4,5,6])
+},{"./character.coffee":4}]},{},[3,4,5,6,7])

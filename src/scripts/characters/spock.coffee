@@ -7,7 +7,7 @@ class Spock extends Character
 		@replies.push "I am endeavoring, ma'am, to construct a mnemonic circuit using stone knives and bearskins."
 		@replies.push "I have never understood the female capacity to avoid a direct answer to any question."
 		@replies.push "If there are self-made purgatories, then we all have to live in them. Mine can be no worse than someone else's."
-		@replies.push "Logic is little tweeting bird chirping in meadow. Logic is wreath of pretty flowers that smell bad."
+		@replies.push "Logic is a little tweeting bird chirping in meadow. Logic is a wreath of pretty flowers that smell bad."
 		@replies.push "Your illogical approach to chess does have its advantages on occasion."
 		@replies.push "After a time, you may find that having is not so pleasing a thing, after all, as wanting. It is not logical, but it is often true."
 		@replies.push "Computers make excellent and efficient servants, but I have no wish to serve under them."
