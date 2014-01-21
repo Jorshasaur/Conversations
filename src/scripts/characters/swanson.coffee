@@ -32,7 +32,7 @@ class Swanson extends Character
 		@replies.push "Give a man a fish and feed him for a day. Don’t teach a man to fish…and feed yourself. He’s a grown man. And fishing’s not that hard."
 		@replies.push "Child labor laws are ruining this country."
 		@replies.push "Great job, everyone. The reception will be held in each of our individual houses, alone."
-		@replies.push "America: The only country that matters. If you want to experience other 'cultures,'' use an atlas or a ham radio."
+		@replies.push "America: The only country that matters. If you want to experience other 'cultures,' use an atlas or a ham radio."
 		@replies.push "The key to burning an ex-wife effigy is to dip it in paraffin wax and then toss the flaming bottle of isopropyl alcohol from a safe distance. Do not stand too close when you light an ex-wife effigy."
 		@replies.push "There are only three ways to motivate people: money, fear, and hunger."
 		@replies.push "Shorts over six inches are capri pants, shorts under six inches are European."
@@ -40,7 +40,6 @@ class Swanson extends Character
 		@replies.push "Breakfast food can serve many purposes."
 		@replies.push "One rage every three months is permitted. Try not to hurt anyone who doesn’t deserve it."
 		@replies.push "Strippers do nothing for me…but I will take a free breakfast buffet anytime, anyplace."
-		@replies.push "You had me at meat tornado."
 		@replies.push "On second thought i think i will have that third steak."
 
 

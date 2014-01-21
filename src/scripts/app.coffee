@@ -9,6 +9,6 @@ $(document).ready ->
 	@swanson = new Swanson()
 	random = @swanson.random()
 	ranVeronica = @veronica.ask random
-	console.log "Ron Swanson::", random
-	console.log "Veronica Palmer::", ranVeronica
-	console.log "Spock::", @spock.ask random
+	$("#swanson").text "Ron Swanson, \"" + random + "\""
+	$("#palmer").text "Veronica Palmer, \"" + ranVeronica + "\""
+	$("#spock").text "Spock, \"" +@spock.ask(random) + "\""

@@ -9024,9 +9024,9 @@ $(document).ready(function() {
   this.swanson = new Swanson();
   random = this.swanson.random();
   ranVeronica = this.veronica.ask(random);
-  console.log("Ron Swanson::", random);
-  console.log("Veronica Palmer::", ranVeronica);
-  return console.log("Spock::", this.spock.ask(random));
+  $("#swanson").text("Ron Swanson, \"" + random + "\"");
+  $("#palmer").text("Veronica Palmer, \"" + ranVeronica + "\"");
+  return $("#spock").text("Spock, \"" + this.spock.ask(random) + "\"");
 });
 
 
@@ -9203,7 +9203,7 @@ Swanson = (function(_super) {
     this.replies.push("Give a man a fish and feed him for a day. Don’t teach a man to fish…and feed yourself. He’s a grown man. And fishing’s not that hard.");
     this.replies.push("Child labor laws are ruining this country.");
     this.replies.push("Great job, everyone. The reception will be held in each of our individual houses, alone.");
-    this.replies.push("America: The only country that matters. If you want to experience other 'cultures,'' use an atlas or a ham radio.");
+    this.replies.push("America: The only country that matters. If you want to experience other 'cultures,' use an atlas or a ham radio.");
     this.replies.push("The key to burning an ex-wife effigy is to dip it in paraffin wax and then toss the flaming bottle of isopropyl alcohol from a safe distance. Do not stand too close when you light an ex-wife effigy.");
     this.replies.push("There are only three ways to motivate people: money, fear, and hunger.");
     this.replies.push("Shorts over six inches are capri pants, shorts under six inches are European.");
@@ -9211,7 +9211,6 @@ Swanson = (function(_super) {
     this.replies.push("Breakfast food can serve many purposes.");
     this.replies.push("One rage every three months is permitted. Try not to hurt anyone who doesn’t deserve it.");
     this.replies.push("Strippers do nothing for me…but I will take a free breakfast buffet anytime, anyplace.");
-    this.replies.push("You had me at meat tornado.");
     return this.replies.push("On second thought i think i will have that third steak.");
   };
 
