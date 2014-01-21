@@ -1,4 +1,4 @@
-Vector = require "./vector.coffee"
+$ = require '../../dist/vendor/jquery/jquery.js'
 
-s = new Vector()
+$(document).ready ->
 

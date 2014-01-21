@@ -10,5 +10,8 @@
     "dist/vendor",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {
+    "jquery": "~2.0.3"
+  }
 }

@@ -1036,30 +1036,275 @@ function hasOwnProperty(obj, prop) {
 }
 
 },{"./support/isBuffer":4,"__browserify_process":3,"inherits":2}],6:[function(require,module,exports){
-var Vector;
+(function() {
+  'use strict';
 
-Vector = function() {
-  return this.name = "VECTOR!";
-};
+  /**
+   * Extend an Object with another Object's properties.
+   *
+   * The source objects are specified as additional arguments.
+   *
+   * @param dst Object the object to extend.
+   *
+   * @return Object the final object.
+   */
+  var _extend = function(dst) {
+    var sources = Array.prototype.slice.call(arguments, 1);
+    for (var i=0; i<sources.length; ++i) {
+      var src = sources[i];
+      for (var p in src) {
+        if (src.hasOwnProperty(p)) dst[p] = src[p];
+      }
+    }
+    return dst;
+  };
 
-module.exports = Vector;
+  /**
+   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
+   */
+  var Levenshtein = {
+    /**
+     * Calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @return Integer the levenshtein distance (0 and above).
+     */
+    get: function(str1, str2) {
+      // base cases
+      if (str1 === str2) return 0;
+      if (str1.length === 0) return str2.length;
+      if (str2.length === 0) return str1.length;
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      // calculate current row distance from previous row
+      for (i=0; i<str1.length; ++i) {
+        current[0] = i + 1;
+
+        for (j=0; j<str2.length; ++j) {
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+        }
+
+        // copy current into previous (in preparation for next iteration)
+        previous[j] = current[j];
+      }
+
+      return current[str2.length];
+    },
+
+    /**
+     * Asynchronously calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @param cb Function callback function with signature: function(Error err, int distance)
+     * @param [options] Object additional options.
+     * @param [options.progress] Function progress callback with signature: function(percentComplete)
+     */
+    getAsync: function(str1, str2, cb, options) {
+      options = _extend({}, {
+        progress: null
+      }, options);
+
+      // base cases
+      if (str1 === str2) return cb(null, 0);
+      if (str1.length === 0) return cb(null, str2.length);
+      if (str2.length === 0) return cb(null, str1.length);
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j, startTime, currentTime;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      current[0] = 1;
+
+      i = 0;
+      j = -1;
+
+      var __calculate = function() {
+        // reset timer
+        startTime = new Date().valueOf();
+        currentTime = startTime;
+
+        // keep going until one second has elapsed
+        while (currentTime - startTime < 1000) {
+          // reached end of current row?
+          if (str2.length <= (++j)) {
+            // copy current into previous (in preparation for next iteration)
+            previous[j] = current[j];
+
+            // if already done all chars
+            if (str1.length <= (++i)) {
+              return cb(null, current[str2.length]);
+            }
+            // else if we have more left to do
+            else {
+              current[0] = i + 1;
+              j = 0;
+            }
+          }
+
+          // calculation
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+
+          // get current time
+          currentTime = new Date().valueOf();
+        }
+
+        // send a progress update?
+        if (null !== options.progress) {
+          try {
+            options.progress.call(null, (i * 100.0/ str1.length));
+          } catch (err) {
+            return cb('Progress callback: ' + err.toString());
+          }
+        }
+
+        // next iteration
+        setTimeout(__calculate(), 0);
+      };
+
+      __calculate();
+    }
+
+  };
+
+
+  if (typeof define !== "undefined" && define !== null && define.amd) {
+    define(function() {
+      return Levenshtein;
+    });
+  } else if (typeof module !== "undefined" && module !== null) {
+    module.exports = Levenshtein;
+  } else {
+    if (typeof window !== "undefined" && window !== null) {
+      window.Levenshtein = Levenshtein;
+    }
+  }
+}());
 
 
 },{}],7:[function(require,module,exports){
-var Vector, assert;
+var Character, leven;
+
+leven = require('fast-levenshtein');
+
+Character = (function() {
+  function Character() {
+    this.buildReplies();
+  }
+
+  Character.prototype.buildReplies = function() {
+    this.replies = [];
+    this.replies.push("I have no idea.");
+    this.replies.push("You should think more on that.");
+    this.replies.push("That doesn't make any sense, please elaborate.");
+    return this.replies.push("Really?  That doesn't sound right.");
+  };
+
+  Character.prototype.ask = function(question) {
+    var closestReply, distance, reply, _i, _len, _ref;
+    closestReply = "";
+    this.closestDistance = 999;
+    question = this.formatSentence(question);
+    _ref = this.replies;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      reply = _ref[_i];
+      distance = leven.get(this.formatSentence(reply), question);
+      if (distance < this.closestDistance) {
+        this.closestDistance = distance;
+        closestReply = reply;
+      }
+    }
+    return closestReply;
+  };
+
+  Character.prototype.formatSentence = function(sentence) {
+    sentence = this.stripCharacters(sentence);
+    return sentence.toLowerCase();
+  };
+
+  Character.prototype.stripCharacters = function(sentence) {
+    return sentence.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+  };
+
+  return Character;
+
+})();
+
+module.exports = Character;
+
+
+},{"fast-levenshtein":6}],8:[function(require,module,exports){
+var Character, assert;
 
 assert = require('assert');
 
-Vector = require('../scripts/vector.coffee');
+Character = require('../scripts/characters/character.coffee');
 
-describe("Vector tests", function() {
+describe("Character tests", function() {
   beforeEach(function() {
-    return this.vector = new Vector();
+    return this.character = new Character();
   });
-  return it("should have the correct name set", function() {
-    return assert.equal(this.vector.name, "VECTOR!");
+  it("should find a distance of zero for 'I have no idea' when that is the question.", function() {
+    this.character.ask("I have no idea.");
+    return assert.equal(this.character.closestDistance, 0);
+  });
+  it("should find a distance of zero for 'I have no idea' when that is the question with no punctuation.", function() {
+    this.character.ask("I have no idea");
+    return assert.equal(this.character.closestDistance, 0);
+  });
+  it("should find a distance of zero for 'I have no idea' when that is the question with differing punctuation.", function() {
+    this.character.ask("I have no idea!!!");
+    return assert.equal(this.character.closestDistance, 0);
+  });
+  it("should find a distance of zero for 'I have no idea' when that is the question with differing cases.", function() {
+    this.character.ask("I HAVE NO IDEA.");
+    return assert.equal(this.character.closestDistance, 0);
+  });
+  it("should answer 'I have no idea.' to 'What are you wearing today?'", function() {
+    var answer;
+    answer = this.character.ask("What are you wearing today?");
+    return assert.equal(answer, "I have no idea.");
+  });
+  it("should not have a distance 0 to 'What are you wearing today?'", function() {
+    this.character.ask("What are you wearing today?");
+    return assert.notEqual(this.character.closestDistance, 0);
+  });
+  return it("should answer 'You should think more on that.' to 'I should think more about rabbits.'", function() {
+    var answer;
+    answer = this.character.ask("I should think about more rabbits.");
+    return assert.equal(answer, "You should think more on that.");
   });
 });
 
 
-},{"../scripts/vector.coffee":6,"assert":1}]},{},[7])
+},{"../scripts/characters/character.coffee":7,"assert":1}]},{},[8])
