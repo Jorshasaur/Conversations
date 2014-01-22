@@ -1,4 +1,181 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  /**
+   * Extend an Object with another Object's properties.
+   *
+   * The source objects are specified as additional arguments.
+   *
+   * @param dst Object the object to extend.
+   *
+   * @return Object the final object.
+   */
+  var _extend = function(dst) {
+    var sources = Array.prototype.slice.call(arguments, 1);
+    for (var i=0; i<sources.length; ++i) {
+      var src = sources[i];
+      for (var p in src) {
+        if (src.hasOwnProperty(p)) dst[p] = src[p];
+      }
+    }
+    return dst;
+  };
+
+  /**
+   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
+   */
+  var Levenshtein = {
+    /**
+     * Calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @return Integer the levenshtein distance (0 and above).
+     */
+    get: function(str1, str2) {
+      // base cases
+      if (str1 === str2) return 0;
+      if (str1.length === 0) return str2.length;
+      if (str2.length === 0) return str1.length;
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      // calculate current row distance from previous row
+      for (i=0; i<str1.length; ++i) {
+        current[0] = i + 1;
+
+        for (j=0; j<str2.length; ++j) {
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+        }
+
+        // copy current into previous (in preparation for next iteration)
+        previous[j] = current[j];
+      }
+
+      return current[str2.length];
+    },
+
+    /**
+     * Asynchronously calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @param cb Function callback function with signature: function(Error err, int distance)
+     * @param [options] Object additional options.
+     * @param [options.progress] Function progress callback with signature: function(percentComplete)
+     */
+    getAsync: function(str1, str2, cb, options) {
+      options = _extend({}, {
+        progress: null
+      }, options);
+
+      // base cases
+      if (str1 === str2) return cb(null, 0);
+      if (str1.length === 0) return cb(null, str2.length);
+      if (str2.length === 0) return cb(null, str1.length);
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j, startTime, currentTime;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      current[0] = 1;
+
+      i = 0;
+      j = -1;
+
+      var __calculate = function() {
+        // reset timer
+        startTime = new Date().valueOf();
+        currentTime = startTime;
+
+        // keep going until one second has elapsed
+        while (currentTime - startTime < 1000) {
+          // reached end of current row?
+          if (str2.length <= (++j)) {
+            // copy current into previous (in preparation for next iteration)
+            previous[j] = current[j];
+
+            // if already done all chars
+            if (str1.length <= (++i)) {
+              return cb(null, current[str2.length]);
+            }
+            // else if we have more left to do
+            else {
+              current[0] = i + 1;
+              j = 0;
+            }
+          }
+
+          // calculation
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+
+          // get current time
+          currentTime = new Date().valueOf();
+        }
+
+        // send a progress update?
+        if (null !== options.progress) {
+          try {
+            options.progress.call(null, (i * 100.0/ str1.length));
+          } catch (err) {
+            return cb('Progress callback: ' + err.toString());
+          }
+        }
+
+        // next iteration
+        setTimeout(__calculate(), 0);
+      };
+
+      __calculate();
+    }
+
+  };
+
+
+  if (typeof define !== "undefined" && define !== null && define.amd) {
+    define(function() {
+      return Levenshtein;
+    });
+  } else if (typeof module !== "undefined" && module !== null) {
+    module.exports = Levenshtein;
+  } else {
+    if (typeof window !== "undefined" && window !== null) {
+      window.Levenshtein = Levenshtein;
+    }
+  }
+}());
+
+
+},{}],2:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -360,7 +537,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":5}],2:[function(require,module,exports){
+},{"util/":6}],3:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -385,7 +562,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -440,14 +617,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var process=require("__browserify_process"),global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1035,184 +1212,48 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-},{"./support/isBuffer":4,"__browserify_process":3,"inherits":2}],6:[function(require,module,exports){
-(function() {
-  'use strict';
+},{"./support/isBuffer":5,"__browserify_process":4,"inherits":3}],7:[function(require,module,exports){
+var CharacterQueue;
 
-  /**
-   * Extend an Object with another Object's properties.
-   *
-   * The source objects are specified as additional arguments.
-   *
-   * @param dst Object the object to extend.
-   *
-   * @return Object the final object.
-   */
-  var _extend = function(dst) {
-    var sources = Array.prototype.slice.call(arguments, 1);
-    for (var i=0; i<sources.length; ++i) {
-      var src = sources[i];
-      for (var p in src) {
-        if (src.hasOwnProperty(p)) dst[p] = src[p];
-      }
-    }
-    return dst;
-  };
-
-  /**
-   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
-   */
-  var Levenshtein = {
-    /**
-     * Calculate levenshtein distance of the two strings.
-     *
-     * @param str1 String the first string.
-     * @param str2 String the second string.
-     * @return Integer the levenshtein distance (0 and above).
-     */
-    get: function(str1, str2) {
-      // base cases
-      if (str1 === str2) return 0;
-      if (str1.length === 0) return str2.length;
-      if (str2.length === 0) return str1.length;
-
-      // two rows
-      var previous  = new Array(str2.length + 1),
-          current = new Array(str2.length + 1),
-          i, j;
-
-      // initialise previous row
-      for (i=0; i<previous.length; ++i) {
-        previous[i] = i;
-      }
-
-      // calculate current row distance from previous row
-      for (i=0; i<str1.length; ++i) {
-        current[0] = i + 1;
-
-        for (j=0; j<str2.length; ++j) {
-          current[j + 1] = Math.min(
-              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
-              current[j] + 1,    // insertion
-              previous[j + 1] + 1 // deletion
-          );
-
-          // copy current into previous (in preparation for next iteration)
-          previous[j] = current[j];
-        }
-
-        // copy current into previous (in preparation for next iteration)
-        previous[j] = current[j];
-      }
-
-      return current[str2.length];
-    },
-
-    /**
-     * Asynchronously calculate levenshtein distance of the two strings.
-     *
-     * @param str1 String the first string.
-     * @param str2 String the second string.
-     * @param cb Function callback function with signature: function(Error err, int distance)
-     * @param [options] Object additional options.
-     * @param [options.progress] Function progress callback with signature: function(percentComplete)
-     */
-    getAsync: function(str1, str2, cb, options) {
-      options = _extend({}, {
-        progress: null
-      }, options);
-
-      // base cases
-      if (str1 === str2) return cb(null, 0);
-      if (str1.length === 0) return cb(null, str2.length);
-      if (str2.length === 0) return cb(null, str1.length);
-
-      // two rows
-      var previous  = new Array(str2.length + 1),
-          current = new Array(str2.length + 1),
-          i, j, startTime, currentTime;
-
-      // initialise previous row
-      for (i=0; i<previous.length; ++i) {
-        previous[i] = i;
-      }
-
-      current[0] = 1;
-
-      i = 0;
-      j = -1;
-
-      var __calculate = function() {
-        // reset timer
-        startTime = new Date().valueOf();
-        currentTime = startTime;
-
-        // keep going until one second has elapsed
-        while (currentTime - startTime < 1000) {
-          // reached end of current row?
-          if (str2.length <= (++j)) {
-            // copy current into previous (in preparation for next iteration)
-            previous[j] = current[j];
-
-            // if already done all chars
-            if (str1.length <= (++i)) {
-              return cb(null, current[str2.length]);
-            }
-            // else if we have more left to do
-            else {
-              current[0] = i + 1;
-              j = 0;
-            }
-          }
-
-          // calculation
-          current[j + 1] = Math.min(
-              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
-              current[j] + 1,    // insertion
-              previous[j + 1] + 1 // deletion
-          );
-
-          // copy current into previous (in preparation for next iteration)
-          previous[j] = current[j];
-
-          // get current time
-          currentTime = new Date().valueOf();
-        }
-
-        // send a progress update?
-        if (null !== options.progress) {
-          try {
-            options.progress.call(null, (i * 100.0/ str1.length));
-          } catch (err) {
-            return cb('Progress callback: ' + err.toString());
-          }
-        }
-
-        // next iteration
-        setTimeout(__calculate(), 0);
-      };
-
-      __calculate();
-    }
-
-  };
-
-
-  if (typeof define !== "undefined" && define !== null && define.amd) {
-    define(function() {
-      return Levenshtein;
-    });
-  } else if (typeof module !== "undefined" && module !== null) {
-    module.exports = Levenshtein;
-  } else {
-    if (typeof window !== "undefined" && window !== null) {
-      window.Levenshtein = Levenshtein;
-    }
+CharacterQueue = (function() {
+  function CharacterQueue() {
+    this.cache = [];
   }
-}());
+
+  CharacterQueue.prototype.addCharacter = function(character) {
+    this.cache.push(character);
+    return this.reset();
+  };
+
+  CharacterQueue.prototype.reset = function() {
+    return this.characters = this.cache.slice(0);
+  };
+
+  CharacterQueue.prototype.next = function() {
+    var character, ran;
+    if (this.characters.length === 0) {
+      return 0;
+    }
+    ran = this.random();
+    character = this.characters[ran];
+    this.characters.splice(ran, 1);
+    return character;
+  };
+
+  CharacterQueue.prototype.random = function() {
+    var ran;
+    ran = Math.round(Math.random() * (this.characters.length - 1));
+    return ran;
+  };
+
+  return CharacterQueue;
+
+})();
+
+module.exports = CharacterQueue;
 
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var Character, leven;
 
 leven = require('fast-levenshtein');
@@ -1287,7 +1328,7 @@ Character = (function() {
 module.exports = Character;
 
 
-},{"fast-levenshtein":6}],8:[function(require,module,exports){
+},{"fast-levenshtein":1}],9:[function(require,module,exports){
 var Character, Spock, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1340,7 +1381,171 @@ Spock = (function(_super) {
 module.exports = Spock;
 
 
-},{"./character.coffee":7}],9:[function(require,module,exports){
+},{"./character.coffee":8}],10:[function(require,module,exports){
+var Character, Swanson, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Character = require("./character.coffee");
+
+Swanson = (function(_super) {
+  __extends(Swanson, _super);
+
+  function Swanson() {
+    _ref = Swanson.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Swanson.prototype.buildReplies = function() {
+    this.replies.push("Clear alcohols are for rich women on diets.");
+    this.replies.push("Crying: acceptable at funerals and the Grand Canyon.");
+    this.replies.push("I am going to consume all of this at the same time because I am a free American.");
+    this.replies.push("Under my tutelage, you will grow from boys to men. From men into gladiators. And from gladiators into Swansons.");
+    this.replies.push("I'm a simple man. I like pretty, dark-haired women, and breakfast food.");
+    this.replies.push("Never half-ass two things. Whole-ass one thing.");
+    this.replies.push("Straight down the middle. No hook, no spin, no fuss. Anything more and this becomes figure skating.");
+    this.replies.push("I don’t want to paint with a broad brush here, but every single contractor in the world is a miserable, incompetent thief.");
+    this.replies.push("Fishing relaxes me. It’s like yoga, except I still get to kill something.");
+    this.replies.push("Just give me all the bacon and eggs you have.");
+    this.replies.push("When people get a little too chummy with me I like to call them by the wrong name to let them know I don’t really care about them.");
+    this.replies.push("There’s only one thing I hate more than lying: skim milk. Which is water that’s lying about being milk.");
+    this.replies.push("The government is a greedy piglet that suckles on a taxpayer’s teat until they have sore, chapped nipples.");
+    this.replies.push("I once worked with a guy for three years and never learned his name. Best friend I ever had. We still never talk sometimes.");
+    this.replies.push("When I eat, it is the food that is scared.");
+    this.replies.push("My only official recommendations are US Army-issued mustache trimmers, Morton’s Salt, and the C.R. Lawrence Fein two inch axe-style scraper oscillating knife blade.");
+    this.replies.push("Are you going to tell a man that he can’t fart in his own car?");
+    this.replies.push("Turkey can never beat cow.");
+    this.replies.push("It’s always a good idea to demonstrate to your coworkers that you are capable of withstanding a tremendous amount of pain.");
+    this.replies.push("There are three acceptable haircuts: high and tight, crew cut, buzz cut.");
+    this.replies.push("Capitalism: God’s way of determining who is smart and who is poor.");
+    this.replies.push("Any dog under fifty pounds is a cat and cats are useless.");
+    this.replies.push("Fish, for sport only, not for meat. Fish meat is practically a vegetable.");
+    this.replies.push("There is only one bad word: taxes.");
+    this.replies.push("History began July 4th, 1776. Anything before that was a mistake.");
+    this.replies.push("Cultivating a manly musk puts opponent on notice.");
+    this.replies.push("Give a man a fish and feed him for a day. Don’t teach a man to fish…and feed yourself. He’s a grown man. And fishing’s not that hard.");
+    this.replies.push("Child labor laws are ruining this country.");
+    this.replies.push("Great job, everyone. The reception will be held in each of our individual houses, alone.");
+    this.replies.push("America: The only country that matters. If you want to experience other 'cultures,' use an atlas or a ham radio.");
+    this.replies.push("The key to burning an ex-wife effigy is to dip it in paraffin wax and then toss the flaming bottle of isopropyl alcohol from a safe distance. Do not stand too close when you light an ex-wife effigy.");
+    this.replies.push("There are only three ways to motivate people: money, fear, and hunger.");
+    this.replies.push("Shorts over six inches are capri pants, shorts under six inches are European.");
+    this.replies.push("Friends: one to three is sufficient.");
+    this.replies.push("Breakfast food can serve many purposes.");
+    this.replies.push("One rage every three months is permitted. Try not to hurt anyone who doesn’t deserve it.");
+    this.replies.push("Strippers do nothing for me…but I will take a free breakfast buffet anytime, anyplace.");
+    return this.replies.push("On second thought i think i will have that third steak.");
+  };
+
+  return Swanson;
+
+})(Character);
+
+module.exports = Swanson;
+
+
+},{"./character.coffee":8}],11:[function(require,module,exports){
+var Character, Veronica, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Character = require("./character.coffee");
+
+Veronica = (function(_super) {
+  __extends(Veronica, _super);
+
+  function Veronica() {
+    _ref = Veronica.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Veronica.prototype.buildReplies = function() {
+    this.replies.push("The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives.");
+    this.replies.push("I saw what was going on in there between you and Fraulein Cheekbones. When you show her around town, keep your Hansels off her Gretels.");
+    this.replies.push("Oh, God, we have unhappy Germans. Nothing good has ever come from that.");
+    this.replies.push("Because I'm good at everything I do. I'm not bragging, because bragging is the one thing I'm not good at. Although, if I wanted to be, I'd be excellent at that, too. As I just proved.");
+    this.replies.push("Do you live here? Do all the cubicle workers have little hobbit holes like this?");
+    this.replies.push("We believe the multi-language translator will create a furor in Germany, a furor that will sweep across Europe, crushing... no.");
+    this.replies.push("It's just a fun game we're playing--like dress-up, only instead of clothes, we're dressing up the things that are coming out of your mouth.");
+    this.replies.push("I want to burn his diaper and salt the earth beneath it so no new product will ever grow there.");
+    this.replies.push("Well, you are eager and desperate for my approval. And that's two of the three qualities I look for in a partner.");
+    this.replies.push("Then I am ready to leave the monastery and avenge my parents.");
+    this.replies.push("I just buy expensive shoes made from very soft animals.");
+    this.replies.push("I don't take the high road. The high road leads to Pansy Town.");
+    this.replies.push("You're so moral and perfect all the time. Do singing birds and mice dress you and brush your hair in the morning?");
+    this.replies.push("Has waving your hands ever sold me on anything?");
+    this.replies.push("Did that MRE touch your boobies? Then shut the hell up.");
+    this.replies.push("In fact, we need to talk about us. And the future of our babies and how they'll be committed.");
+    this.replies.push("I need this relationship to have a future because I need babies.");
+    this.replies.push("I think I might need new breasts. These are covered in sadness.");
+    this.replies.push("I don't hate the Dutch. I love the Dutch. That's why I hold them to a higher standard.");
+    this.replies.push("So this is guilt, huh? In the past, I've always just counteracted this feeling with other emotions, like sugar or drunk.");
+    this.replies.push("Maybe my kindergarten teacher was right. Maybe I am too controlling.");
+    this.replies.push("No, the microphone-attaching elf who lives in my drawer.");
+    this.replies.push("Together, we're like Gandhi. I'm skinny, and you're tan.");
+    this.replies.push("The company loves its money. If they could, they'd go to strip clubs and throw naked women at money.");
+    this.replies.push("The company feels that if we ease up because someone dies, it will only encourage other people to die.");
+    this.replies.push("I heard about Jenkins' death. The company feels terrible about it.");
+    this.replies.push("They're also floating the idea that his being dead may have been a pre-existing condition, and that he may not have been alive when we hired him.");
+    this.replies.push("So am I, and I'll bet Rommel didn't wear a thong underneath his.");
+    this.replies.push("That's the sound of me deflecting the whiny bitching with my happiness shield.");
+    this.replies.push("Great news! You both have a disease.");
+    this.replies.push("We're having a problem with some of those people who live in the cubicles.");
+    this.replies.push("Then when their guard's down, smash them with a phone.");
+    return this.replies.push("God, you people are paranoid. No wonder the company has to secretly manipulate you.");
+  };
+
+  return Veronica;
+
+})(Character);
+
+module.exports = Veronica;
+
+
+},{"./character.coffee":8}],12:[function(require,module,exports){
+var CharacterQueue, Spock, Swanson, Veronica, assert;
+
+assert = require('assert');
+
+CharacterQueue = require('../scripts/characters/character-queue.coffee');
+
+Spock = require('../scripts/characters/spock.coffee');
+
+Swanson = require('../scripts/characters/swanson.coffee');
+
+Veronica = require('../scripts/characters/veronica.coffee');
+
+describe("Character Queue", function() {
+  beforeEach(function() {
+    this.queue = new CharacterQueue();
+    this.queue.addCharacter(new Spock);
+    this.queue.addCharacter(new Swanson);
+    return this.queue.addCharacter(new Veronica);
+  });
+  it("should have 3 characters when characters are added.", function() {
+    return assert.equal(this.queue.characters.length, 3);
+  });
+  it("should have a length of 2 when one is removed using next.", function() {
+    this.queue.next();
+    return assert.equal(this.queue.characters.length, 2);
+  });
+  it("should have return 0 when all of the characters are removed.", function() {
+    this.queue.next();
+    this.queue.next();
+    this.queue.next();
+    return assert.equal(this.queue.next(), 0);
+  });
+  return it("should have a length of 3 when next is run 3 times and then reset is called", function() {
+    this.queue.next();
+    this.queue.next();
+    this.queue.next();
+    this.queue.reset();
+    return assert.equal(this.queue.characters.length, 3);
+  });
+});
+
+
+},{"../scripts/characters/character-queue.coffee":7,"../scripts/characters/spock.coffee":9,"../scripts/characters/swanson.coffee":10,"../scripts/characters/veronica.coffee":11,"assert":2}],13:[function(require,module,exports){
 var Character, assert;
 
 assert = require('assert');
@@ -1384,7 +1589,7 @@ describe("Character tests", function() {
 });
 
 
-},{"../scripts/characters/character.coffee":7,"assert":1}],10:[function(require,module,exports){
+},{"../scripts/characters/character.coffee":8,"assert":2}],14:[function(require,module,exports){
 var Spock, assert;
 
 assert = require('assert');
@@ -1403,4 +1608,4 @@ describe("Spock tests", function() {
 });
 
 
-},{"../scripts/characters/spock.coffee":8,"assert":1}]},{},[9,10])
+},{"../scripts/characters/spock.coffee":9,"assert":2}]},{},[12,13,14])

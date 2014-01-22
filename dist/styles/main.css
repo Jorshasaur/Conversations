@@ -1,1 +1,8 @@
-/*** MAIN SCSS FILE ***/
+@import url('/vendor/bootstrap/dist/css/bootstrap.css');
+@import url('/vendor/bootstrap/dist/css/bootstrap-theme.css');
+#question {
+  margin-top: 20px; }
+  #question input {
+    width: 100%;
+    font-size: 24px;
+    margin-top: 3px; }

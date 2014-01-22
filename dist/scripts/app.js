@@ -9030,7 +9030,48 @@ $(document).ready(function() {
 });
 
 
-},{"../../dist/vendor/jquery/jquery.js":1,"./characters/spock.coffee":5,"./characters/swanson.coffee":6,"./characters/veronica.coffee":7}],4:[function(require,module,exports){
+},{"../../dist/vendor/jquery/jquery.js":1,"./characters/spock.coffee":6,"./characters/swanson.coffee":7,"./characters/veronica.coffee":8}],4:[function(require,module,exports){
+var CharacterQueue;
+
+CharacterQueue = (function() {
+  function CharacterQueue() {
+    this.cache = [];
+  }
+
+  CharacterQueue.prototype.addCharacter = function(character) {
+    this.cache.push(character);
+    return this.reset();
+  };
+
+  CharacterQueue.prototype.reset = function() {
+    return this.characters = this.cache.slice(0);
+  };
+
+  CharacterQueue.prototype.next = function() {
+    var character, ran;
+    if (this.characters.length === 0) {
+      return 0;
+    }
+    ran = this.random();
+    character = this.characters[ran];
+    this.characters.splice(ran, 1);
+    return character;
+  };
+
+  CharacterQueue.prototype.random = function() {
+    var ran;
+    ran = Math.round(Math.random() * (this.characters.length - 1));
+    return ran;
+  };
+
+  return CharacterQueue;
+
+})();
+
+module.exports = CharacterQueue;
+
+
+},{}],5:[function(require,module,exports){
 var Character, leven;
 
 leven = require('fast-levenshtein');
@@ -9105,7 +9146,7 @@ Character = (function() {
 module.exports = Character;
 
 
-},{"fast-levenshtein":2}],5:[function(require,module,exports){
+},{"fast-levenshtein":2}],6:[function(require,module,exports){
 var Character, Spock, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -9158,7 +9199,7 @@ Spock = (function(_super) {
 module.exports = Spock;
 
 
-},{"./character.coffee":4}],6:[function(require,module,exports){
+},{"./character.coffee":5}],7:[function(require,module,exports){
 var Character, Swanson, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -9221,7 +9262,7 @@ Swanson = (function(_super) {
 module.exports = Swanson;
 
 
-},{"./character.coffee":4}],7:[function(require,module,exports){
+},{"./character.coffee":5}],8:[function(require,module,exports){
 var Character, Veronica, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -9279,4 +9320,4 @@ Veronica = (function(_super) {
 module.exports = Veronica;
 
 
-},{"./character.coffee":4}]},{},[3,4,5,6,7])
+},{"./character.coffee":5}]},{},[3,4,5,6,7,8])

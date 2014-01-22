@@ -4,7 +4,10 @@ html(lang="en")
         title Simple Web App
         link(href='styles/main.css', type="text/css", rel="stylesheet")
     body
-        h2#swanson
-        h2#palmer
-        h2#spock
+        .row(id="question")
+            .col-sm-9.col-sm-offset-1
+                input(placeholder="Enter Your Question", type="text")
+            .col-sm-1
+                button.btn.btn-primary.btn-lg Ask
+
         script(src="scripts/app.js", type="text/javascript")
