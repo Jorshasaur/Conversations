@@ -1,6 +1,11 @@
 Character = require "./character.coffee"
 
 class Swanson extends Character
+
+	constructor: ->
+		super
+		@name = "Ron Swanson"
+		@image = "images/swanson.jpg"		
 	
 	buildReplies: ->
 		@replies.push "Clear alcohols are for rich women on diets."

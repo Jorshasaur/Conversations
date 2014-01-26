@@ -2,6 +2,11 @@ Character = require "./character.coffee"
 
 class Spock extends Character
 	
+	constructor: ->
+		super
+		@name = "Spock"
+		@image = "images/spock.jpg"
+	
 	buildReplies: ->
 		@replies.push "It is curious how often you humans manage to obtain that which you do not want."
 		@replies.push "I am endeavoring, ma'am, to construct a mnemonic circuit using stone knives and bearskins."

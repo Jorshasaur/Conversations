@@ -1259,9 +1259,14 @@ var Character, leven;
 leven = require('fast-levenshtein');
 
 Character = (function() {
-  function Character() {
+  var shuffle;
+
+  function Character(name, image) {
+    this.name = name;
+    this.image = image;
     this.replies = [];
     this.buildReplies();
+    this.lastReply = "";
   }
 
   Character.prototype.buildReplies = function() {
@@ -1272,23 +1277,22 @@ Character = (function() {
   };
 
   Character.prototype.ask = function(question) {
-    var closestReply, count, distance, reply, _i, _len, _ref;
-    closestReply = "";
+    var count, distance, reply, shuffled, _i, _len;
     this.closestDistance = 999;
     question = this.formatSentence(question);
-    _ref = this.replies;
-    for (count = _i = 0, _len = _ref.length; _i < _len; count = ++_i) {
-      reply = _ref[count];
+    shuffled = shuffle(this.replies.slice(0));
+    for (count = _i = 0, _len = shuffled.length; _i < _len; count = ++_i) {
+      reply = shuffled[count];
       distance = leven.get(this.formatSentence(reply), question);
       if (distance === 0) {
         return this.getRandomReplyWithExclusion(count);
       }
       if (distance < this.closestDistance) {
         this.closestDistance = distance;
-        closestReply = reply;
+        this.lastReply = reply;
       }
     }
-    return closestReply;
+    return this.lastReply;
   };
 
   Character.prototype.getRandomReplyWithExclusion = function(index) {
@@ -1305,7 +1309,8 @@ Character = (function() {
   };
 
   Character.prototype.random = function() {
-    return this.getRandomReply(this.replies);
+    this.lastReply = this.getRandomReply(this.replies);
+    return this.lastReply;
   };
 
   Character.prototype.formatSentence = function(sentence) {
@@ -1321,6 +1326,27 @@ Character = (function() {
     return this.replies.slice(0);
   };
 
+  shuffle = function(arr, required) {
+    var i, index, randInt, _i, _ref, _ref1, _ref2;
+    if (required == null) {
+      required = arr.length;
+    }
+    randInt = function(n) {
+      return Math.floor(n * Math.random());
+    };
+    if (required > arr.length) {
+      required = arr.length;
+    }
+    if (required <= 1) {
+      return arr[randInt(arr.length)];
+    }
+    for (i = _i = _ref = arr.length - 1, _ref1 = arr.length - required; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = _ref <= _ref1 ? ++_i : --_i) {
+      index = randInt(i + 1);
+      _ref2 = [arr[i], arr[index]], arr[index] = _ref2[0], arr[i] = _ref2[1];
+    }
+    return arr.slice(arr.length - required);
+  };
+
   return Character;
 
 })();
@@ -1329,7 +1355,7 @@ module.exports = Character;
 
 
 },{"fast-levenshtein":1}],9:[function(require,module,exports){
-var Character, Spock, _ref,
+var Character, Spock,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1339,8 +1365,9 @@ Spock = (function(_super) {
   __extends(Spock, _super);
 
   function Spock() {
-    _ref = Spock.__super__.constructor.apply(this, arguments);
-    return _ref;
+    Spock.__super__.constructor.apply(this, arguments);
+    this.name = "Spock";
+    this.image = "images/spock.jpg";
   }
 
   Spock.prototype.buildReplies = function() {
@@ -1382,7 +1409,7 @@ module.exports = Spock;
 
 
 },{"./character.coffee":8}],10:[function(require,module,exports){
-var Character, Swanson, _ref,
+var Character, Swanson,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1392,8 +1419,9 @@ Swanson = (function(_super) {
   __extends(Swanson, _super);
 
   function Swanson() {
-    _ref = Swanson.__super__.constructor.apply(this, arguments);
-    return _ref;
+    Swanson.__super__.constructor.apply(this, arguments);
+    this.name = "Ron Swanson";
+    this.image = "images/swanson.jpg";
   }
 
   Swanson.prototype.buildReplies = function() {
@@ -1445,7 +1473,7 @@ module.exports = Swanson;
 
 
 },{"./character.coffee":8}],11:[function(require,module,exports){
-var Character, Veronica, _ref,
+var Character, Veronica,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1455,8 +1483,9 @@ Veronica = (function(_super) {
   __extends(Veronica, _super);
 
   function Veronica() {
-    _ref = Veronica.__super__.constructor.apply(this, arguments);
-    return _ref;
+    Veronica.__super__.constructor.apply(this, arguments);
+    this.name = "Veronica Palmer";
+    this.image = "images/veronica.jpg";
   }
 
   Veronica.prototype.buildReplies = function() {

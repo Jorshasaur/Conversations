@@ -1,6 +1,11 @@
 Character = require "./character.coffee"
 
 class Veronica extends Character
+
+	constructor: ->
+		super
+		@name = "Veronica Palmer"
+		@image = "images/veronica.jpg"
 	
 	buildReplies: ->
 		@replies.push "The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives."

@@ -3,11 +3,13 @@ html(lang="en")
     head
         title Simple Web App
         link(href='styles/main.css', type="text/css", rel="stylesheet")
-    body
+        script(src="scripts/app.js", type="text/javascript")
+    body(ng-app="conversations", ng-controller="appController")
         .row(id="question")
             .col-sm-9.col-sm-offset-1
-                input(placeholder="Enter Your Question", type="text")
-            .col-sm-1
-                button.btn.btn-primary.btn-lg Ask
-
-        script(src="scripts/app.js", type="text/javascript")
+                input(placeholder="Ask For Guidance", type="text", id="guidance", ui-keypress="{13:'onEnterPressed($event)'}")
+            .col-sm-2
+                button.btn.btn-primary.btn-lg#ask(ng-click="onEnterPressed($event)") Ask
+        .row
+            .col-sm-12
+                replies(question="question")

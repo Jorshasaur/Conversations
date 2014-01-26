@@ -1,0 +1,8 @@
+.row.character(ng-repeat="character in characters")
+	.col-sm-12.col-sm-offset-1
+		.row
+			.col-sm-2
+				img.img-circle(ng-src="{{character.image}}")
+			.col-sm-7.character-answer
+				h4 {{character.name}}
+				p.lead {{character.lastReply}}
