@@ -8,6 +8,7 @@ class Veronica extends Character
 		@image = "images/veronica.jpg"
 	
 	buildReplies: ->
+		@replies.push "My door is always open, please close it on the way out."
 		@replies.push "The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives."
 		@replies.push "I saw what was going on in there between you and Fraulein Cheekbones. When you show her around town, keep your Hansels off her Gretels."
 		@replies.push "Oh, God, we have unhappy Germans. Nothing good has ever come from that."
