@@ -31723,6 +31723,7 @@ Character = (function() {
     this.replies = [];
     this.buildReplies();
     this.lastReply = "";
+    this.oldestReply = "";
   }
 
   Character.prototype.buildReplies = function() {
@@ -31741,13 +31742,20 @@ Character = (function() {
       reply = shuffled[count];
       distance = leven.get(this.formatSentence(reply), question);
       if (distance === 0) {
-        return this.getRandomReplyWithExclusion(count);
+        this.lastReply = this.getRandomReplyWithExclusion(count);
+        this.oldestReply = this.lastReply;
+        return this.lastReply;
       }
       if (distance < this.closestDistance) {
         this.closestDistance = distance;
         this.lastReply = reply;
+        if (this.oldestReply === this.lastReply) {
+          this.lastReply = this.getRandomReplyWithExclusion(count);
+        }
       }
     }
+    this.oldestReply = this.lastReply;
+    console.log(this.oldestReply, this.lastReply);
     return this.lastReply;
   };
 
@@ -31945,6 +31953,8 @@ Veronica = (function(_super) {
   }
 
   Veronica.prototype.buildReplies = function() {
+    this.replies.push("Money before people, that's the company motto!.");
+    this.replies.push("My door is always open, please close it on the way out.");
     this.replies.push("The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives.");
     this.replies.push("I saw what was going on in there between you and Fraulein Cheekbones. When you show her around town, keep your Hansels off her Gretels.");
     this.replies.push("Oh, God, we have unhappy Germans. Nothing good has ever come from that.");
