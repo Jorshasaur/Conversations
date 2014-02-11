@@ -31668,7 +31668,7 @@ require('./replies.coffee');
 angular.module("conversations", ['conversations.controllers', 'conversations.directives']);
 
 
-},{"../../dist/vendor/angular/angular":2,"./controllers.coffee":11,"./replies.coffee":12}],6:[function(require,module,exports){
+},{"../../dist/vendor/angular/angular":2,"./controllers.coffee":12,"./replies.coffee":13}],6:[function(require,module,exports){
 var CharacterQueue;
 
 CharacterQueue = (function() {
@@ -31852,6 +31852,56 @@ module.exports = Character;
 
 
 },{"fast-levenshtein":4}],8:[function(require,module,exports){
+var Character, MichaelScott,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Character = require("./character.coffee");
+
+MichaelScott = (function(_super) {
+  __extends(MichaelScott, _super);
+
+  function MichaelScott() {
+    MichaelScott.__super__.constructor.apply(this, arguments);
+    this.name = "Michael Scott";
+    this.image = "images/scott.jpg";
+  }
+
+  MichaelScott.prototype.buildReplies = function() {
+    this.replies.push("I am dead inside.");
+    this.replies.push("Where are the turtles!");
+    this.replies.push("The worst thing about prison was -- was the Dementors");
+    this.replies.push("Welcome back jerky jerk face.");
+    this.replies.push("Sometimes I'll start a sentence and I don't know where it's going.  I just hope I find it along the way.");
+    this.replies.push("Occasionally, I'll hit someone with my car.  So sue me.");
+    this.replies.push("If I had a gun with two bullets and I was in a room with Hitler, Bin Laden, and Toby, I would shoot Toby twice.");
+    this.replies.push("Should have burned this place down when I had the chance.");
+    this.replies.push("Well just tell him to call me ASAP as possible.");
+    this.replies.push("Well happy birthday Jesus.  Sorry your party is so lame.");
+    this.replies.push("It's a good thing Russia doesn't exist anymore.");
+    this.replies.push("I will literally kill you and your entire family.");
+    this.replies.push("And you know what's going to be on your tombstone? Loser.");
+    this.replies.push("I want people to be afraid of how much they love me.");
+    this.replies.push("You don't know me, you've just seen my penis.");
+    this.replies.push("Do you think that doing alcohol is cool?");
+    this.replies.push("That's what she said.");
+    this.replies.push("I DECLARE BANKRUPTCY!!!!");
+    this.replies.push("I'm not superstitious but I am a little stitious.");
+    this.replies.push("I like waking up to the smell of bacon.");
+    this.replies.push("Big butt.  Bigger heart.");
+    this.replies.push("You just gots to get your freak on.");
+    this.replies.push("We're all homos.  Homo Sapiens.");
+    return this.replies.push("If a baby were president, there would be no taxes.  There would be no war.");
+  };
+
+  return MichaelScott;
+
+})(Character);
+
+module.exports = MichaelScott;
+
+
+},{"./character.coffee":7}],9:[function(require,module,exports){
 var Character, Spock,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -31905,7 +31955,7 @@ Spock = (function(_super) {
 module.exports = Spock;
 
 
-},{"./character.coffee":7}],9:[function(require,module,exports){
+},{"./character.coffee":7}],10:[function(require,module,exports){
 var Character, Swanson,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -31969,7 +32019,7 @@ Swanson = (function(_super) {
 module.exports = Swanson;
 
 
-},{"./character.coffee":7}],10:[function(require,module,exports){
+},{"./character.coffee":7}],11:[function(require,module,exports){
 var Character, Veronica,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -32030,7 +32080,7 @@ Veronica = (function(_super) {
 module.exports = Veronica;
 
 
-},{"./character.coffee":7}],11:[function(require,module,exports){
+},{"./character.coffee":7}],12:[function(require,module,exports){
 var $;
 
 $ = require('../../dist/vendor/jquery/jquery.js');
@@ -32051,8 +32101,8 @@ angular.module("conversations.controllers").controller("appController", [
 ]);
 
 
-},{"../../dist/vendor/angular-ui-utils/ui-utils.js":1,"../../dist/vendor/angular/angular.js":2,"../../dist/vendor/jquery/jquery.js":3}],12:[function(require,module,exports){
-var CharacterQueue, Spock, Swanson, Veronica;
+},{"../../dist/vendor/angular-ui-utils/ui-utils.js":1,"../../dist/vendor/angular/angular.js":2,"../../dist/vendor/jquery/jquery.js":3}],13:[function(require,module,exports){
+var CharacterQueue, MichaelScott, Spock, Swanson, Veronica;
 
 require('../../dist/vendor/angular/angular.js');
 
@@ -32061,6 +32111,8 @@ Spock = require('./characters/spock.coffee');
 Veronica = require('./characters/veronica.coffee');
 
 Swanson = require('./characters/swanson.coffee');
+
+MichaelScott = require('./characters/scott.coffee');
 
 CharacterQueue = require('./characters/character-queue.coffee');
 
@@ -32074,14 +32126,16 @@ angular.module("conversations.directives").directive("replies", [
       return $scope = _$scope_;
     };
     buildCharacters = function() {
-      var spock, swanson, veronica;
+      var scott, spock, swanson, veronica;
       spock = new Spock();
       veronica = new Veronica();
       swanson = new Swanson();
+      scott = new MichaelScott();
       this.queue = new CharacterQueue();
       this.queue.addCharacter(spock);
       this.queue.addCharacter(veronica);
-      return this.queue.addCharacter(swanson);
+      this.queue.addCharacter(swanson);
+      return this.queue.addCharacter(scott);
     };
     askCharacters = function() {
       var asking, character, characters, lastResponse;
@@ -32128,4 +32182,4 @@ angular.module("conversations.directives").directive("replies", [
 ]);
 
 
-},{"../../dist/vendor/angular/angular.js":2,"./characters/character-queue.coffee":6,"./characters/spock.coffee":8,"./characters/swanson.coffee":9,"./characters/veronica.coffee":10}]},{},[5,11,12,6,7,8,9,10])
+},{"../../dist/vendor/angular/angular.js":2,"./characters/character-queue.coffee":6,"./characters/scott.coffee":8,"./characters/spock.coffee":9,"./characters/swanson.coffee":10,"./characters/veronica.coffee":11}]},{},[5,12,13,6,7,8,9,10,11])
