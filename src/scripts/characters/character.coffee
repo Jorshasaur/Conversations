@@ -5,6 +5,7 @@ class Character
     @replies = []
     @buildReplies()
     @lastReply = ""
+    @replyHistory = []
 
   buildReplies: ->
     @replies.push "I have no idea."
@@ -13,19 +14,45 @@ class Character
     @replies.push "Really?  That doesn't sound right."
 
   ask: (question)->
+    shuffled = shuffle @replies.slice(0)
+    rep = @getReply question, shuffled
+    if @isInReplyHistory(rep.reply)
+      shuffled.splice(rep.count, 1)
+      @lastReply = @getRandomReply shuffled
+    else
+      @lastReply = rep.reply
+
+    @addToHistory @lastReply
+    return @lastReply
+
+  addToHistory: (reply)->
+    if @replyHistory.length == 1 then @replyHistory.pop()
+    @replyHistory.push @lastReply
+
+  isInReplyHistory: (reply)->
+    for rep in @replyHistory
+      if rep is reply then return true
+    return false
+
+  getReply: (question, shuffled)->
     @closestDistance = 999
     question = @formatSentence question
-    shuffled = shuffle @replies.slice(0)
+    rep = ""
     for reply, count in shuffled
       distance = leven.get @formatSentence(reply), question
       if distance is 0
-        @lastReply = @getRandomReplyWithExclusion count
-        @oldestReply = @lastReply
-        return @lastReply
+        ran = @getRandomReplyWithExclusion count
+        return {
+          reply: ran
+          count: count
+        }
       if distance < @closestDistance
         @closestDistance = distance
-        @lastReply = reply
-    return @lastReply
+        rep = {
+          reply: reply
+          count: count
+        }
+    return rep
 
   getRandomReplyWithExclusion: (index)->
     clone = @cloneReplies()

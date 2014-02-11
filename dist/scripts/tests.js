@@ -1267,7 +1267,7 @@ Character = (function() {
     this.replies = [];
     this.buildReplies();
     this.lastReply = "";
-    this.oldestReply = "";
+    this.replyHistory = [];
   }
 
   Character.prototype.buildReplies = function() {
@@ -1278,29 +1278,62 @@ Character = (function() {
   };
 
   Character.prototype.ask = function(question) {
-    var count, distance, reply, shuffled, _i, _len;
+    var rep, shuffled;
+    shuffled = shuffle(this.replies.slice(0));
+    rep = this.getReply(question, shuffled);
+    if (this.isInReplyHistory(rep.reply)) {
+      shuffled.splice(rep.count, 1);
+      this.lastReply = this.getRandomReply(shuffled);
+    } else {
+      this.lastReply = rep.reply;
+    }
+    this.addToHistory(this.lastReply);
+    return this.lastReply;
+  };
+
+  Character.prototype.addToHistory = function(reply) {
+    if (this.replyHistory.length === 1) {
+      this.replyHistory.pop();
+    }
+    return this.replyHistory.push(this.lastReply);
+  };
+
+  Character.prototype.isInReplyHistory = function(reply) {
+    var rep, _i, _len, _ref;
+    _ref = this.replyHistory;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      rep = _ref[_i];
+      if (rep === reply) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  Character.prototype.getReply = function(question, shuffled) {
+    var count, distance, ran, rep, reply, _i, _len;
     this.closestDistance = 999;
     question = this.formatSentence(question);
-    shuffled = shuffle(this.replies.slice(0));
+    rep = "";
     for (count = _i = 0, _len = shuffled.length; _i < _len; count = ++_i) {
       reply = shuffled[count];
       distance = leven.get(this.formatSentence(reply), question);
       if (distance === 0) {
-        this.lastReply = this.getRandomReplyWithExclusion(count);
-        this.oldestReply = this.lastReply;
-        return this.lastReply;
+        ran = this.getRandomReplyWithExclusion(count);
+        return {
+          reply: ran,
+          count: count
+        };
       }
       if (distance < this.closestDistance) {
         this.closestDistance = distance;
-        this.lastReply = reply;
-        if (this.oldestReply === this.lastReply) {
-          this.lastReply = this.getRandomReplyWithExclusion(count);
-        }
+        rep = {
+          reply: reply,
+          count: count
+        };
       }
     }
-    this.oldestReply = this.lastReply;
-    console.log(this.oldestReply, this.lastReply);
-    return this.lastReply;
+    return rep;
   };
 
   Character.prototype.getRandomReplyWithExclusion = function(index) {
@@ -1630,7 +1663,6 @@ describe("Character tests", function() {
     question = "I should think about more rabbitss.";
     answer = this.character.ask(question);
     answer2 = this.character.ask(question);
-    console.log(answer, answer2);
     return assert.notEqual(answer, answer2);
   });
 });

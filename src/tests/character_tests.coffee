@@ -37,5 +37,4 @@ describe "Character tests", ->
     question = "I should think about more rabbitss."
     answer = @character.ask question
     answer2 = @character.ask question
-    console.log answer, answer2
     assert.notEqual answer, answer2
