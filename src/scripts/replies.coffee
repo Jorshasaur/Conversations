@@ -27,8 +27,7 @@ angular.module("conversations.directives").directive "replies", ['$timeout', ($t
   askCharacters = ->
     @queue.reset()
     characters = []
-    #asking = Math.round(Math.random() * (@queue.characters.length-1)) + 1
-    asking = 4
+    asking = Math.round(Math.random() * (@queue.characters.length-1)) + 1
     lastResponse = $scope.question
     while asking != 0
       character = @queue.next()
