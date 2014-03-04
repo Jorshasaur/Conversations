@@ -14,28 +14,31 @@ class Character
     @replies.push "Really?  That doesn't sound right."
 
   ask: (question)->
-    shuffled = @cloneReplies()
-    rep = @getReply question, shuffled
+    question = @formatSentence(question)
+    rep = @getReply question
     return @lastReply
 
-  addToHistory: (reply)->
-    if @replyHistory.length == 3 then @replyHistory.pop()
-    @replyHistory.push @lastReply
+  addToHistory: (reply, count)->
+    @replies.splice count,1
+    if @replyHistory.length == 3
+      toAddBack = @replyHistory.pop()
+      @replies.push toAddBack
+    @replyHistory.push reply
 
-  isInReplyHistory: (reply)->
-    for rep in @replyHistory
-      if rep is reply then return true
-    return false
-
-  getReply: (question, shuffled)->
-    @closestDistance = 999
+  getReply: (question)->
+    @closestDistance = 9999
+    questionLocation = 0
     question = @formatSentence question
-    for reply, count in shuffled
+    for reply, count in @replies
       distance = leven.get @formatSentence(reply), question
-      if distance > 0 && distance < @closestDistance && !@isInReplyHistory(reply)
+      if distance == 0
+        @addToHistory(reply, count)
+        return @getReply(question)
+      else if distance < @closestDistance
         @closestDistance = distance
         @lastReply = reply
-    @addToHistory(@lastReply)
+        questionLocation = count
+    @addToHistory(@lastReply, questionLocation)
     return @lastReply
 
   getRandomReplyWithExclusion: (index)->
@@ -61,7 +64,7 @@ class Character
   cloneReplies: ->
     return @replies.slice(0)
 
-  shuffle = (arr, required=arr.length) ->
+  shuffle: (arr, required=arr.length)->
       randInt = (n) -> Math.floor n * Math.random()
       required = arr.length if required > arr.length
       return arr[randInt(arr.length)] if required <= 1

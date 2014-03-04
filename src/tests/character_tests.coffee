@@ -51,7 +51,12 @@ describe "Character tests", ->
   it "should give the first answer on the 4th question that is the same", ->
     question = "I should think about more rabbits.."
     answer = @character.ask question
-    answer2 = @character.ask question
+    @character.ask question
+    @character.ask question
     answer3 = @character.ask question
-    answer4 = @character.ask question
-    assert.notEqual answer, answer4
+#    @character.ask question
+#    answer4 = @character.ask question
+    console.log @character.replies
+    console.log @character.replyHistory
+    console.log answer, answer3
+    assert.equal answer, answer3

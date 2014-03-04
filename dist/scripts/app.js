@@ -31715,8 +31715,6 @@ var Character, leven;
 leven = require('fast-levenshtein');
 
 Character = (function() {
-  var shuffle;
-
   function Character(name, image) {
     this.name = name;
     this.image = image;
@@ -31734,44 +31732,41 @@ Character = (function() {
   };
 
   Character.prototype.ask = function(question) {
-    var rep, shuffled;
-    shuffled = this.cloneReplies();
-    rep = this.getReply(question, shuffled);
+    var rep;
+    question = this.formatSentence(question);
+    rep = this.getReply(question);
     return this.lastReply;
   };
 
-  Character.prototype.addToHistory = function(reply) {
+  Character.prototype.addToHistory = function(reply, count) {
+    var toAddBack;
+    this.replies.splice(count, 1);
     if (this.replyHistory.length === 3) {
-      this.replyHistory.pop();
+      toAddBack = this.replyHistory.pop();
+      this.replies.push(toAddBack);
     }
-    return this.replyHistory.push(this.lastReply);
+    return this.replyHistory.push(reply);
   };
 
-  Character.prototype.isInReplyHistory = function(reply) {
-    var rep, _i, _len, _ref;
-    _ref = this.replyHistory;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      rep = _ref[_i];
-      if (rep === reply) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  Character.prototype.getReply = function(question, shuffled) {
-    var count, distance, reply, _i, _len;
-    this.closestDistance = 999;
+  Character.prototype.getReply = function(question) {
+    var count, distance, questionLocation, reply, _i, _len, _ref;
+    this.closestDistance = 9999;
+    questionLocation = 0;
     question = this.formatSentence(question);
-    for (count = _i = 0, _len = shuffled.length; _i < _len; count = ++_i) {
-      reply = shuffled[count];
+    _ref = this.replies;
+    for (count = _i = 0, _len = _ref.length; _i < _len; count = ++_i) {
+      reply = _ref[count];
       distance = leven.get(this.formatSentence(reply), question);
-      if (distance > 0 && distance < this.closestDistance && !this.isInReplyHistory(reply)) {
+      if (distance === 0) {
+        this.addToHistory(reply, count);
+        return this.getReply(question);
+      } else if (distance < this.closestDistance) {
         this.closestDistance = distance;
         this.lastReply = reply;
+        questionLocation = count;
       }
     }
-    this.addToHistory(this.lastReply);
+    this.addToHistory(this.lastReply, questionLocation);
     return this.lastReply;
   };
 
@@ -31806,7 +31801,7 @@ Character = (function() {
     return this.replies.slice(0);
   };
 
-  shuffle = function(arr, required) {
+  Character.prototype.shuffle = function(arr, required) {
     var i, index, randInt, _i, _ref, _ref1, _ref2;
     if (required == null) {
       required = arr.length;
@@ -32124,7 +32119,7 @@ angular.module("conversations.directives").directive("replies", [
       var asking, character, characters, lastResponse;
       this.queue.reset();
       characters = [];
-      asking = Math.round(Math.random() * (this.queue.characters.length - 1)) + 1;
+      asking = 4;
       lastResponse = $scope.question;
       while (asking !== 0) {
         character = this.queue.next();
