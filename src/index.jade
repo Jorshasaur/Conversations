@@ -5,11 +5,15 @@ html(lang="en")
         link(href='styles/main.css', type="text/css", rel="stylesheet")
         script(src="scripts/app.js", type="text/javascript")
     body(ng-app="conversations", ng-controller="appController")
+        .row(id="copy")
+            .col-sm-12.text-center
+                h1.col-sm-12 Need help?
+                p.col-sm-8.col-sm-offset-2 Ask some of the most amazing bosses from American television what you should do to make through the drudgery of day to day office life.
         .row(id="question")
-            .col-sm-9.col-sm-offset-1
+            .col-lg-9.col-lg-offset-1
                 input(placeholder="Ask For Guidance", type="text", id="guidance", ui-keypress="{13:'onEnterPressed($event)'}")
-            .col-sm-2
-                button.btn.btn-primary.btn-lg#ask(ng-click="onEnterPressed($event)") Ask
+            .col-lg-1.col-lg-offset-0
+                button.btn.btn-primary.btn-lg.btn-block#ask(ng-click="onEnterPressed($event)") Ask
         .row
             .col-sm-12
                 replies(question="question")

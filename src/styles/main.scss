@@ -1,6 +1,24 @@
 @import '../vendor/bootstrap/dist/css/bootstrap.css';
 @import '../vendor/bootstrap/dist/css/bootstrap-theme.css';
 
+body{
+  background:url(../images/background.jpg) fixed no-repeat;
+  background-size: 100%;
+}
+
+#copy{
+  color: #fff;
+  text-shadow: -1px 0px 5px rgba(0, 0, 0, 1);
+
+  h1{
+    font-size: 4em;
+  }
+
+  p{
+    font-size: 1.5em;
+  }
+}
+
 #question{
 	margin-top: 20px;
 
@@ -17,6 +35,9 @@
 	transition-duration: 0.5s;
 	opacity: 0;
 	margin-top: 30px;
+    //color: #fff;
+    //text-shadow: -1px 0px 5px rgba(0, 0, 0, 0.5);
+    background-color: #fff;
 
 	img{
 		height: 120px;

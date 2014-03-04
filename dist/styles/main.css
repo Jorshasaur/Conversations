@@ -1,5 +1,17 @@
 @import url('../vendor/bootstrap/dist/css/bootstrap.css');
 @import url('../vendor/bootstrap/dist/css/bootstrap-theme.css');
+body {
+  background: url(../images/background.jpg) fixed no-repeat;
+  background-size: 100%; }
+
+#copy {
+  color: white;
+  text-shadow: -1px 0px 5px black; }
+  #copy h1 {
+    font-size: 4em; }
+  #copy p {
+    font-size: 1.5em; }
+
 #question {
   margin-top: 20px; }
   #question input {
@@ -11,7 +23,8 @@
   transition-property: opacity;
   transition-duration: 0.5s;
   opacity: 0;
-  margin-top: 30px; }
+  margin-top: 30px;
+  background-color: white; }
   .character img {
     height: 120px; }
   .character .character-answer {
