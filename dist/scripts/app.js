@@ -32119,7 +32119,7 @@ angular.module("conversations.directives").directive("replies", [
       var asking, character, characters, lastResponse;
       this.queue.reset();
       characters = [];
-      asking = 4;
+      asking = Math.round(Math.random() * (this.queue.characters.length - 1)) + 1;
       lastResponse = $scope.question;
       while (asking !== 0) {
         character = this.queue.next();
