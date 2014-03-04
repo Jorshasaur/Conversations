@@ -1,5 +1,5 @@
-@import url('/vendor/bootstrap/dist/css/bootstrap.css');
-@import url('/vendor/bootstrap/dist/css/bootstrap-theme.css');
+@import url('../vendor/bootstrap/dist/css/bootstrap.css');
+@import url('../vendor/bootstrap/dist/css/bootstrap-theme.css');
 #question {
   margin-top: 20px; }
   #question input {

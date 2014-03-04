@@ -1,181 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  /**
-   * Extend an Object with another Object's properties.
-   *
-   * The source objects are specified as additional arguments.
-   *
-   * @param dst Object the object to extend.
-   *
-   * @return Object the final object.
-   */
-  var _extend = function(dst) {
-    var sources = Array.prototype.slice.call(arguments, 1);
-    for (var i=0; i<sources.length; ++i) {
-      var src = sources[i];
-      for (var p in src) {
-        if (src.hasOwnProperty(p)) dst[p] = src[p];
-      }
-    }
-    return dst;
-  };
-
-  /**
-   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
-   */
-  var Levenshtein = {
-    /**
-     * Calculate levenshtein distance of the two strings.
-     *
-     * @param str1 String the first string.
-     * @param str2 String the second string.
-     * @return Integer the levenshtein distance (0 and above).
-     */
-    get: function(str1, str2) {
-      // base cases
-      if (str1 === str2) return 0;
-      if (str1.length === 0) return str2.length;
-      if (str2.length === 0) return str1.length;
-
-      // two rows
-      var previous  = new Array(str2.length + 1),
-          current = new Array(str2.length + 1),
-          i, j;
-
-      // initialise previous row
-      for (i=0; i<previous.length; ++i) {
-        previous[i] = i;
-      }
-
-      // calculate current row distance from previous row
-      for (i=0; i<str1.length; ++i) {
-        current[0] = i + 1;
-
-        for (j=0; j<str2.length; ++j) {
-          current[j + 1] = Math.min(
-              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
-              current[j] + 1,    // insertion
-              previous[j + 1] + 1 // deletion
-          );
-
-          // copy current into previous (in preparation for next iteration)
-          previous[j] = current[j];
-        }
-
-        // copy current into previous (in preparation for next iteration)
-        previous[j] = current[j];
-      }
-
-      return current[str2.length];
-    },
-
-    /**
-     * Asynchronously calculate levenshtein distance of the two strings.
-     *
-     * @param str1 String the first string.
-     * @param str2 String the second string.
-     * @param cb Function callback function with signature: function(Error err, int distance)
-     * @param [options] Object additional options.
-     * @param [options.progress] Function progress callback with signature: function(percentComplete)
-     */
-    getAsync: function(str1, str2, cb, options) {
-      options = _extend({}, {
-        progress: null
-      }, options);
-
-      // base cases
-      if (str1 === str2) return cb(null, 0);
-      if (str1.length === 0) return cb(null, str2.length);
-      if (str2.length === 0) return cb(null, str1.length);
-
-      // two rows
-      var previous  = new Array(str2.length + 1),
-          current = new Array(str2.length + 1),
-          i, j, startTime, currentTime;
-
-      // initialise previous row
-      for (i=0; i<previous.length; ++i) {
-        previous[i] = i;
-      }
-
-      current[0] = 1;
-
-      i = 0;
-      j = -1;
-
-      var __calculate = function() {
-        // reset timer
-        startTime = new Date().valueOf();
-        currentTime = startTime;
-
-        // keep going until one second has elapsed
-        while (currentTime - startTime < 1000) {
-          // reached end of current row?
-          if (str2.length <= (++j)) {
-            // copy current into previous (in preparation for next iteration)
-            previous[j] = current[j];
-
-            // if already done all chars
-            if (str1.length <= (++i)) {
-              return cb(null, current[str2.length]);
-            }
-            // else if we have more left to do
-            else {
-              current[0] = i + 1;
-              j = 0;
-            }
-          }
-
-          // calculation
-          current[j + 1] = Math.min(
-              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
-              current[j] + 1,    // insertion
-              previous[j + 1] + 1 // deletion
-          );
-
-          // copy current into previous (in preparation for next iteration)
-          previous[j] = current[j];
-
-          // get current time
-          currentTime = new Date().valueOf();
-        }
-
-        // send a progress update?
-        if (null !== options.progress) {
-          try {
-            options.progress.call(null, (i * 100.0/ str1.length));
-          } catch (err) {
-            return cb('Progress callback: ' + err.toString());
-          }
-        }
-
-        // next iteration
-        setTimeout(__calculate(), 0);
-      };
-
-      __calculate();
-    }
-
-  };
-
-
-  if (typeof define !== "undefined" && define !== null && define.amd) {
-    define(function() {
-      return Levenshtein;
-    });
-  } else if (typeof module !== "undefined" && module !== null) {
-    module.exports = Levenshtein;
-  } else {
-    if (typeof window !== "undefined" && window !== null) {
-      window.Levenshtein = Levenshtein;
-    }
-  }
-}());
-
-
-},{}],2:[function(require,module,exports){
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -537,7 +360,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":6}],3:[function(require,module,exports){
+},{"util/":5}],2:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -562,7 +385,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -617,14 +440,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var process=require("__browserify_process"),global=typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {};// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1212,7 +1035,184 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-},{"./support/isBuffer":5,"__browserify_process":4,"inherits":3}],7:[function(require,module,exports){
+},{"./support/isBuffer":4,"__browserify_process":3,"inherits":2}],6:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  /**
+   * Extend an Object with another Object's properties.
+   *
+   * The source objects are specified as additional arguments.
+   *
+   * @param dst Object the object to extend.
+   *
+   * @return Object the final object.
+   */
+  var _extend = function(dst) {
+    var sources = Array.prototype.slice.call(arguments, 1);
+    for (var i=0; i<sources.length; ++i) {
+      var src = sources[i];
+      for (var p in src) {
+        if (src.hasOwnProperty(p)) dst[p] = src[p];
+      }
+    }
+    return dst;
+  };
+
+  /**
+   * Based on the algorithm at http://en.wikipedia.org/wiki/Levenshtein_distance.
+   */
+  var Levenshtein = {
+    /**
+     * Calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @return Integer the levenshtein distance (0 and above).
+     */
+    get: function(str1, str2) {
+      // base cases
+      if (str1 === str2) return 0;
+      if (str1.length === 0) return str2.length;
+      if (str2.length === 0) return str1.length;
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      // calculate current row distance from previous row
+      for (i=0; i<str1.length; ++i) {
+        current[0] = i + 1;
+
+        for (j=0; j<str2.length; ++j) {
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+        }
+
+        // copy current into previous (in preparation for next iteration)
+        previous[j] = current[j];
+      }
+
+      return current[str2.length];
+    },
+
+    /**
+     * Asynchronously calculate levenshtein distance of the two strings.
+     *
+     * @param str1 String the first string.
+     * @param str2 String the second string.
+     * @param cb Function callback function with signature: function(Error err, int distance)
+     * @param [options] Object additional options.
+     * @param [options.progress] Function progress callback with signature: function(percentComplete)
+     */
+    getAsync: function(str1, str2, cb, options) {
+      options = _extend({}, {
+        progress: null
+      }, options);
+
+      // base cases
+      if (str1 === str2) return cb(null, 0);
+      if (str1.length === 0) return cb(null, str2.length);
+      if (str2.length === 0) return cb(null, str1.length);
+
+      // two rows
+      var previous  = new Array(str2.length + 1),
+          current = new Array(str2.length + 1),
+          i, j, startTime, currentTime;
+
+      // initialise previous row
+      for (i=0; i<previous.length; ++i) {
+        previous[i] = i;
+      }
+
+      current[0] = 1;
+
+      i = 0;
+      j = -1;
+
+      var __calculate = function() {
+        // reset timer
+        startTime = new Date().valueOf();
+        currentTime = startTime;
+
+        // keep going until one second has elapsed
+        while (currentTime - startTime < 1000) {
+          // reached end of current row?
+          if (str2.length <= (++j)) {
+            // copy current into previous (in preparation for next iteration)
+            previous[j] = current[j];
+
+            // if already done all chars
+            if (str1.length <= (++i)) {
+              return cb(null, current[str2.length]);
+            }
+            // else if we have more left to do
+            else {
+              current[0] = i + 1;
+              j = 0;
+            }
+          }
+
+          // calculation
+          current[j + 1] = Math.min(
+              previous[j] + ( (str1.charAt(i) === str2.charAt(j)) ? 0 : 1 ),    // substitution
+              current[j] + 1,    // insertion
+              previous[j + 1] + 1 // deletion
+          );
+
+          // copy current into previous (in preparation for next iteration)
+          previous[j] = current[j];
+
+          // get current time
+          currentTime = new Date().valueOf();
+        }
+
+        // send a progress update?
+        if (null !== options.progress) {
+          try {
+            options.progress.call(null, (i * 100.0/ str1.length));
+          } catch (err) {
+            return cb('Progress callback: ' + err.toString());
+          }
+        }
+
+        // next iteration
+        setTimeout(__calculate(), 0);
+      };
+
+      __calculate();
+    }
+
+  };
+
+
+  if (typeof define !== "undefined" && define !== null && define.amd) {
+    define(function() {
+      return Levenshtein;
+    });
+  } else if (typeof module !== "undefined" && module !== null) {
+    module.exports = Levenshtein;
+  } else {
+    if (typeof window !== "undefined" && window !== null) {
+      window.Levenshtein = Levenshtein;
+    }
+  }
+}());
+
+
+},{}],7:[function(require,module,exports){
 var CharacterQueue;
 
 CharacterQueue = (function() {
@@ -1395,7 +1395,7 @@ Character = (function() {
 module.exports = Character;
 
 
-},{"fast-levenshtein":1}],9:[function(require,module,exports){
+},{"fast-levenshtein":6}],9:[function(require,module,exports){
 var Character, Spock,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1617,7 +1617,7 @@ describe("Character Queue", function() {
 });
 
 
-},{"../scripts/characters/character-queue.coffee":7,"../scripts/characters/spock.coffee":9,"../scripts/characters/swanson.coffee":10,"../scripts/characters/veronica.coffee":11,"assert":2}],13:[function(require,module,exports){
+},{"../scripts/characters/character-queue.coffee":7,"../scripts/characters/spock.coffee":9,"../scripts/characters/swanson.coffee":10,"../scripts/characters/veronica.coffee":11,"assert":1}],13:[function(require,module,exports){
 var Character, assert;
 
 assert = require('assert');
@@ -1668,7 +1668,7 @@ describe("Character tests", function() {
 });
 
 
-},{"../scripts/characters/character.coffee":8,"assert":2}],14:[function(require,module,exports){
+},{"../scripts/characters/character.coffee":8,"assert":1}],14:[function(require,module,exports){
 var Spock, assert;
 
 assert = require('assert');
@@ -1687,4 +1687,4 @@ describe("Spock tests", function() {
 });
 
 
-},{"../scripts/characters/spock.coffee":9,"assert":2}]},{},[12,13,14])
+},{"../scripts/characters/spock.coffee":9,"assert":1}]},{},[12,13,14])
