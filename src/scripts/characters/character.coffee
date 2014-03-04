@@ -23,7 +23,7 @@ class Character
     if @replyHistory.length == 3
       toAddBack = @replyHistory.pop()
       @replies.push toAddBack
-    @replyHistory.push reply
+    @replyHistory.unshift reply
 
   getReply: (question)->
     @closestDistance = 9999

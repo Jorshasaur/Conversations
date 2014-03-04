@@ -1289,7 +1289,7 @@ Character = (function() {
       toAddBack = this.replyHistory.pop();
       this.replies.push(toAddBack);
     }
-    return this.replyHistory.push(reply);
+    return this.replyHistory.unshift(reply);
   };
 
   Character.prototype.getReply = function(question) {
@@ -1508,7 +1508,7 @@ Veronica = (function(_super) {
   }
 
   Veronica.prototype.buildReplies = function() {
-    this.replies.push("Money before people, that's the company motto!.");
+    this.replies.push("Money before people, that's the company motto!");
     this.replies.push("My door is always open, please close it on the way out.");
     this.replies.push("The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives.");
     this.replies.push("I saw what was going on in there between you and Fraulein Cheekbones. When you show her around town, keep your Hansels off her Gretels.");
@@ -1653,17 +1653,15 @@ describe("Character tests", function() {
     assert.notEqual(answer, answer3);
     return assert.notEqual(answer2, answer3);
   });
-  return it("should give the first answer on the 4th question that is the same", function() {
-    var answer, answer3, question;
-    question = "I should think about more rabbits..";
+  return it("should give the first answer on the 5th question that is the same", function() {
+    var answer, answer5, question;
+    question = "I should think about more rabbits.";
     answer = this.character.ask(question);
     this.character.ask(question);
     this.character.ask(question);
-    answer3 = this.character.ask(question);
-    console.log(this.character.replies);
-    console.log(this.character.replyHistory);
-    console.log(answer, answer3);
-    return assert.equal(answer, answer3);
+    this.character.ask(question);
+    answer5 = this.character.ask(question);
+    return assert.equal(answer, answer5);
   });
 });
 

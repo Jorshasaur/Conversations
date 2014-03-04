@@ -31745,7 +31745,7 @@ Character = (function() {
       toAddBack = this.replyHistory.pop();
       this.replies.push(toAddBack);
     }
-    return this.replyHistory.push(reply);
+    return this.replyHistory.unshift(reply);
   };
 
   Character.prototype.getReply = function(question) {
@@ -32014,7 +32014,7 @@ Veronica = (function(_super) {
   }
 
   Veronica.prototype.buildReplies = function() {
-    this.replies.push("Money before people, that's the company motto!.");
+    this.replies.push("Money before people, that's the company motto!");
     this.replies.push("My door is always open, please close it on the way out.");
     this.replies.push("The forest will run red with the blood of woodland creatures who doubted little Veronica and will now pay with their furry little lives.");
     this.replies.push("I saw what was going on in there between you and Fraulein Cheekbones. When you show her around town, keep your Hansels off her Gretels.");
