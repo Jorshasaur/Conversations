@@ -14,19 +14,12 @@ class Character
     @replies.push "Really?  That doesn't sound right."
 
   ask: (question)->
-    shuffled = shuffle @replies.slice(0)
+    shuffled = @cloneReplies()
     rep = @getReply question, shuffled
-    if @isInReplyHistory(rep.reply)
-      shuffled.splice(rep.count, 1)
-      @lastReply = @getRandomReply shuffled
-    else
-      @lastReply = rep.reply
-
-    @addToHistory @lastReply
     return @lastReply
 
   addToHistory: (reply)->
-    if @replyHistory.length == 1 then @replyHistory.pop()
+    if @replyHistory.length == 3 then @replyHistory.pop()
     @replyHistory.push @lastReply
 
   isInReplyHistory: (reply)->
@@ -37,22 +30,13 @@ class Character
   getReply: (question, shuffled)->
     @closestDistance = 999
     question = @formatSentence question
-    rep = ""
     for reply, count in shuffled
       distance = leven.get @formatSentence(reply), question
-      if distance is 0
-        ran = @getRandomReplyWithExclusion count
-        return {
-          reply: ran
-          count: count
-        }
-      if distance < @closestDistance
+      if distance > 0 && distance < @closestDistance && !@isInReplyHistory(reply)
         @closestDistance = distance
-        rep = {
-          reply: reply
-          count: count
-        }
-    return rep
+        @lastReply = reply
+    @addToHistory(@lastReply)
+    return @lastReply
 
   getRandomReplyWithExclusion: (index)->
     clone = @cloneReplies()

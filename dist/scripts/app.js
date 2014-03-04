@@ -31735,20 +31735,13 @@ Character = (function() {
 
   Character.prototype.ask = function(question) {
     var rep, shuffled;
-    shuffled = shuffle(this.replies.slice(0));
+    shuffled = this.cloneReplies();
     rep = this.getReply(question, shuffled);
-    if (this.isInReplyHistory(rep.reply)) {
-      shuffled.splice(rep.count, 1);
-      this.lastReply = this.getRandomReply(shuffled);
-    } else {
-      this.lastReply = rep.reply;
-    }
-    this.addToHistory(this.lastReply);
     return this.lastReply;
   };
 
   Character.prototype.addToHistory = function(reply) {
-    if (this.replyHistory.length === 1) {
+    if (this.replyHistory.length === 3) {
       this.replyHistory.pop();
     }
     return this.replyHistory.push(this.lastReply);
@@ -31767,29 +31760,19 @@ Character = (function() {
   };
 
   Character.prototype.getReply = function(question, shuffled) {
-    var count, distance, ran, rep, reply, _i, _len;
+    var count, distance, reply, _i, _len;
     this.closestDistance = 999;
     question = this.formatSentence(question);
-    rep = "";
     for (count = _i = 0, _len = shuffled.length; _i < _len; count = ++_i) {
       reply = shuffled[count];
       distance = leven.get(this.formatSentence(reply), question);
-      if (distance === 0) {
-        ran = this.getRandomReplyWithExclusion(count);
-        return {
-          reply: ran,
-          count: count
-        };
-      }
-      if (distance < this.closestDistance) {
+      if (distance > 0 && distance < this.closestDistance && !this.isInReplyHistory(reply)) {
         this.closestDistance = distance;
-        rep = {
-          reply: reply,
-          count: count
-        };
+        this.lastReply = reply;
       }
     }
-    return rep;
+    this.addToHistory(this.lastReply);
+    return this.lastReply;
   };
 
   Character.prototype.getRandomReplyWithExclusion = function(index) {
