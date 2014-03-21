@@ -8,7 +8,7 @@ CharacterQueue = require './characters/character-queue.coffee'
 
 angular.module("conversations.directives", [])
 angular.module("conversations.directives").directive "replies", ['$timeout', ($timeout)->
-	
+
   $scope = {}
   cacheScope = (_$scope_)->
     $scope = _$scope_
@@ -55,6 +55,8 @@ angular.module("conversations.directives").directive "replies", ['$timeout', ($t
     link: ($scope, element, attrs)->
       cacheScope $scope
       buildCharacters()
+      if typeof $scope.question != "undefined"
+        askCharacters()
       $scope.$watch "question", (newValue, oldValue)->
         if typeof newValue != "undefined"
           askCharacters()

@@ -32620,6 +32620,9 @@ angular.module("conversations.directives").directive("replies", [
       link: function($scope, element, attrs) {
         cacheScope($scope);
         buildCharacters();
+        if (typeof $scope.question !== "undefined") {
+          askCharacters();
+        }
         return $scope.$watch("question", function(newValue, oldValue) {
           if (typeof newValue !== "undefined") {
             return askCharacters();

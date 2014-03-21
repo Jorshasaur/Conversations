@@ -8,6 +8,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'dist/vendor/angular/angular.js',
+      'dist/vendor/angular-mocks/angular-mocks.js',
       'dist/vendor/angular-ui-utils/ui-utils.js',
       'dist/scripts/app.js',
       'dist/scripts/tests.js'
@@ -49,6 +50,7 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     // CLI --browsers Chrome,Firefox,Safari
+//    browsers: ['PhantomJS', 'Chrome', 'Firefox'],
     browsers: ['PhantomJS', 'Chrome', 'Firefox'],
 
     // If browser does not capture in given timeout [ms], kill it
@@ -65,8 +67,8 @@ module.exports = function(config) {
 
     plugins: [
       'karma-mocha',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
+      // 'karma-chrome-launcher',
+      // 'karma-firefox-launcher',
       'karma-phantomjs-launcher'
     ]
   });
