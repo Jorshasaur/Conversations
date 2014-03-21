@@ -5,7 +5,7 @@ module.exports = (grunt)->
 
     browserify:
       dist:
-        files: 
+        files:
           "dist/scripts/app.js": ['src/scripts/*.coffee', 'src/scripts/**/*.coffee']
           "dist/scripts/tests.js": ['src/tests/*.coffee', 'src/tests/**/*.coffee']
       options:
@@ -32,10 +32,10 @@ module.exports = (grunt)->
         ignoreLeaks: false
         ui: 'bdd'
         reporter: 'spec'
-      all: 
-        src: ['dist/scripts/tests.js']          
+      all:
+        src: ['dist/scripts/tests.js']
 
-    connect: 
+    connect:
       server:
         options:
           hostname: '0.0.0.0'
@@ -57,6 +57,11 @@ module.exports = (grunt)->
         files:
           'dist/scripts/app.min.js': ['dist/scripts/app.js']
 
+    karma:
+      unit:
+        configFile: 'src/tests/karma.config.js'
+        keepalive: true
+
   }
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
@@ -67,7 +72,8 @@ module.exports = (grunt)->
   grunt.loadNpmTasks 'grunt-browserify'
   grunt.loadNpmTasks 'grunt-simple-mocha'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
+  grunt.loadNpmTasks 'grunt-karma'
 
   grunt.registerTask 'default', ['browserify', 'jade', 'sass', 'simplemocha']
-  grunt.registerTask 'serve', ['default', 'connect', 'watch']
-  grunt.registerTask 'build', ['browserify', 'jade', 'sass', 'uglify', 'simplemocha']
+  grunt.registerTask 'watch', ['default', 'connect', 'watch']
+  grunt.registerTask 'build', ['browserify', 'jade', 'sass', 'uglify', 'karma:unit']
